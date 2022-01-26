@@ -1,7 +1,13 @@
 plugins {
     id "org.jetbrains.kotlin.jvm" version "$kotlinVersion"
+    id "maven-publish"
+    id "signing"
     id "java"
 }
+
+def signingPassword = findProperty("signing.password")
+def centralRepoUsername = findProperty("publishing.mavencentral.username")
+def centralRepoPassword = findProperty("publishing.mavencentral.password")
 
 group = projectGroup
 version = projectVersion
@@ -29,4 +35,74 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            groupId = projectGroup
+            artifactId = projectName
+            version = projectVersion
+
+            pom {
+                name = projectName
+                description = projectDescription
+                url = projectGit
+
+                licenses {
+                    license {
+                        name = 'GNU LESSER GENERAL PUBLIC LICENSE, Version 3'
+                        url = 'https://www.gnu.org/licenses/lgpl-3.0.en.html'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = "deftu"
+                        name = "Deftu"
+                        email = "deftudev@gmail.com"
+                    }
+                }
+
+                scm {
+                    url = projectGit
+                }
+            }
+        }
+    }
+
+    if (signingPassword != null && centralRepoUsername != null && centralRepoPassword != null) {
+        repositories {
+            maven {
+                name = "MavenCentral"
+                url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+                credentials {
+                    username = centralRepoUsername
+                    password = centralRepoPassword
+                }
+            }
+        }
+    }
+}
+
+jar {
+    from("LICENSE")
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+artifacts {
+    archives sourcesJar, javadocJar
+}
+
+if (signingPassword != null) {
+    signing {
+        sign publishing.publications.mavenJava
+        sign configurations.archives
+    }
 }
