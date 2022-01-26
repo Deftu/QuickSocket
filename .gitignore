@@ -1,0 +1,24 @@
+# Gradle
+.gradle
+**/build/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
+
+# IntelliJ
+.idea
+!.idea/copyright
+output
+out
+*.iml
+*.ipr
+*.iws
+
+# Eclipse
+eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
