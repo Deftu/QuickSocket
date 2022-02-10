@@ -17,7 +17,7 @@ import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 
 open class QuickSocketServer @JvmOverloads constructor(
-    address: InetSocketAddress? = null,
+    address: InetSocketAddress? = InetSocketAddress(8080),
     val encoded: Boolean = true
 ) : WebSocketServer(
     address
@@ -77,11 +77,17 @@ open class QuickSocketServer @JvmOverloads constructor(
         packet.onPacketReceived(parsed.getAsJsonObject("data") ?: null)
     }
 
+    /**
+     * Adds a new packet to the valid packet registry.
+     */
     fun addPacket(identifier: String, packet: Class<out PacketBase>) {
         if (packets.containsKey(identifier)) throw KeyAlreadyBoundException()
         packets[identifier] = packet
     }
 
+    /**
+     * Sends a packet to one of the clients that this server has a connection to.
+     */
     fun sendPacket(connection: WebSocket, packet: PacketBase) {
         val data = JsonObject()
         packet.onPacketSent(data)

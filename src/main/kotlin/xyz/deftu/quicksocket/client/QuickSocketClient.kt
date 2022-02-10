@@ -76,11 +76,17 @@ open class QuickSocketClient @JvmOverloads constructor(
         packet.onPacketReceived(parsed.getAsJsonObject("data") ?: null)
     }
 
+    /**
+     * Adds a new packet to the valid packet registry.
+     */
     fun addPacket(identifier: String, packet: Class<out PacketBase>) {
         if (packets.containsKey(identifier)) throw KeyAlreadyBoundException()
         packets[identifier] = packet
     }
 
+    /**
+     * Sends a packet to the server that this client is currently connected to.
+     */
     fun sendPacket(packet: PacketBase) {
         val data = JsonObject()
         packet.onPacketSent(data)
